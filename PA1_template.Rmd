@@ -1,6 +1,6 @@
 #Project: Analysis of Steps Per Day.
 
-For the first part of the analysis, I downloaded the file from the URL and load it in R usinf read.csv. No other preprocessing was done on this data set.The main dataset contains 3 variables - "steps", "date" and "interval"
+For the first part of the analysis, I downloaded the file from the URL and load it in R using read.csv. No other preprocessing was done on this data set.The main dataset contains 3 variables - "steps", "date" and "interval"
 
 ```{r simulation,results="hide"}
 library(ggplot2,quietly=TRUE)
@@ -22,15 +22,15 @@ Q1<-function(data)
   d<-aggregate(cbind(steps)~date,data,sum)
   steps_mean<-mean(d$steps)
   steps_med<-median(d$steps)
-  print(paste0("The mean of the total steps per day is: ", round(steps_mean,digits=2)))
-  print(paste0("The median of the total steps per day is: ", round(steps_med,digits=2)))
   g<-ggplot(d,aes(date))+geom_bar(aes(weight=steps))
   g<-g+theme(axis.text.x = element_text(angle = 90))
-  print("The plot showing the total number of steps each day is as shown:")
-  print(g)
   return (list(d,steps_mean,steps_med,g))
   }
 A1<-Q1(data)
+print(paste0("The mean of the total steps per day is: ", round(A1[[2]],digits=2)))
+print(paste0("The median of the total steps per day is: ", round(A1[[3]],digits=2)))
+print("The plot showing the total number of steps each day is as shown:")
+A1[[4]]
 ```
 
 A second function Q2 is also created to calculate the average steps number of steps for each 5-minute interval. The function also takes in the raw data set as input and transforms it using an aggregate function to calculate a different dataset of the average number of steps in each 5-minute interval. The function provides a listed output of the transformed dataset, the 5-minute interval with the maximum number steps and a line plot showing the average steps for each 5-minute interval.
@@ -42,13 +42,13 @@ Q2<-function(data)
   max_avgspd<-max(d$steps)
   TI<-d[which.max(d$steps),"interval"]
   g<-ggplot(d,aes(interval,steps))+geom_line()
-  print(paste0("The maximum average steps per day are: ",round(max_avgspd,digits=2)))
-  print(paste0("And they occur at time intervals: ",TI))
-  print("The plot showing the avg steps for each 5-minute time interval is as shown:")
-  print(g)
-  return(list(d,max_avgspd,g))
+  return(list(d,max_avgspd,TI,g))
   }
 A2<-Q2(data)
+print(paste0("The maximum average steps per day are: ",round(A2[[2]],digits=2)))
+print(paste0("And they occur at time intervals: ",A2[[3]]))
+print("The plot showing the avg steps for each 5-minute time interval is as shown:")
+A2[[4]]
 ```
 
 For imputing the missing valuves, I first, split the main data set into two parts:
@@ -71,6 +71,10 @@ d3<-select(d3,steps,date,interval)
 d3<-rbind(d3,d2)
 d3<-arrange(d3,date,interval)
 A3<-Q1(d3)
+print(paste0("The mean of the total steps per day is: ", round(A3[[2]],digits=2)))
+print(paste0("The median of the total steps per day is: ", round(A3[[3]],digits=2)))
+print("The plot showing the total number of steps each day is as shown:")
+A3[[4]]
 ```
 
 Finally, to compare using a panel plot, the average steps on weekdays and weekends, I first converted the date field into class "Date", using the as.Date function. Then, I added a factor column called "day", to identify using inbuilt functions in R, whether the date is a weekday or weekend. Using the facet grid functions of ggplot2, I created a one row, two column grid that shows two line plots of average steps on weekdays and weekends.
@@ -84,6 +88,6 @@ d<-aggregate(cbind(steps)~interval+day,d3,mean)
 g<-ggplot(d,aes(interval,steps))+geom_line()
 g<-g+facet_grid(.~day)
 print("The panel plot showing the comparison of average number of steps on weekdays and weekends is as shown:")
-print(g)
+g
 ```
 
